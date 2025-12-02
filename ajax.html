@@ -1,0 +1,18 @@
+<div align="center">
+<h1><div id="msg"></div></h1><hr>
+Enter your name: <input type="text" id="input"><hr>
+</div>
+
+<script>
+var input=document.querySelector("#input") //CSS selector
+input.addEventListener('keyup',()=>{ //Arrow function
+	fetch('http://localhost:8000/?greet=Hello&name='+input.value)
+	.then(response => response.text())
+	.then((response) => { //Arrow function
+		console.log(response);
+		document.querySelector("#msg").innerHTML=response;
+	}).catch((err)=>{
+		console.log(err);
+	})
+})
+</script>

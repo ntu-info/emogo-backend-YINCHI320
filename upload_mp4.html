@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Upload MP4 (sync vs async)</title>
+</head>
+<body>
+  <h1>Upload MP4</h1>
+
+  <form id="upload-form">
+    <div>
+      <label>
+        <input type="radio" name="mode" value="sync" checked />
+        Sync (/upload-sync/)
+      </label>
+      <label style="margin-left: 12px;">
+        <input type="radio" name="mode" value="async" />
+        Async (/upload-async/)
+      </label>
+    </div>
+
+    <div style="margin-top: 8px;">
+      <input type="file" name="file" accept="video/mp4" required />
+    </div>
+
+    <div style="margin-top: 8px;">
+      <button type="submit">Upload</button>
+    </div>
+  </form>
+
+  <pre id="result"></pre>
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const resultEl = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const fileInput = form.querySelector('input[name="file"]');
+      if (!fileInput.files.length) {
+        alert('Choose a mp4 file');
+        return;
+      }
+
+      const mode = form.querySelector('input[name="mode"]:checked').value;
+      const url =
+        mode === 'sync'
+          ? 'http://127.0.0.1:8000/upload-sync/'
+          : 'http://127.0.0.1:8000/upload-async/';
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+
+      resultEl.textContent = `Uploading (${mode})...\n`;
+
+      try {
+        // 👇 Timer starts
+        const start = performance.now();
+
+        const res = await fetch(url, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        // 👇 Timer ends
+        const end = performance.now();
+        const elapsedMs = end - start;
+        const elapsedSec = (elapsedMs / 1000).toFixed(3);
+
+        resultEl.textContent =
+          `Mode: ${mode}\n` +
+          `Elapsed: ${elapsedMs.toFixed(0)} ms (~${elapsedSec} s)\n\n` +
+          JSON.stringify(data, null, 2);
+      } catch (err) {
+        resultEl.textContent = 'Error: ' + err;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -27,3 +27,8 @@ Or simply click:
 ## Thanks
 
 Thanks to [Harish](https://harishgarg.com) for the [inspiration to create a FastAPI quickstart for Render](https://twitter.com/harishkgarg/status/1435084018677010434) and for some sample code!
+
+
+user name：yinchi  pw：yinchi1234
+
+mongodb+srv://yinchi:<db_password>@cluster0.1tlpsco.mongodb.net/?appName=Cluster0
