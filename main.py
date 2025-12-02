@@ -1,8 +1,9 @@
 import os
 import aiofiles
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Body
 from fastapi.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient # 新增：資料庫驅動
+from motor.motor_asyncio import AsyncIOMotorClient
+from pydantic import BaseModel # 新增：用來定義資料格式
 
 app = FastAPI()
 
@@ -41,42 +42,67 @@ async def shutdown_db_client():
 def index():
     return {"message": "EmoGo Backend is running!"}
 
-# [修改] 上傳功能：基於原本的 /upload-async/ 修改
-# 老師原本的邏輯是單純存檔，我們加入「寫入資料庫」的動作
+# --- 1. Vlog 功能 (原本的) ---
 @app.post("/upload-vlog/")
-async def upload_video(file: UploadFile = File(...)):
-    # 1. [保留] 原本的存檔邏輯
+async def upload_vlog(file: UploadFile = File(...)):
     file_path = os.path.join("data", file.filename)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
     async with aiofiles.open(file_path, "wb") as buffer:
         while True:
-            chunk = await file.read(1024 * 1024)  # async read
-            if not chunk:
-                break
-            await buffer.write(chunk)            # async write
+            chunk = await file.read(1024 * 1024)
+            if not chunk: break
+            await buffer.write(chunk)
 
-    # 2. [新增] 將紀錄寫入 MongoDB (作業核心要求)
-    # 我們把檔名、路徑記錄下來
     vlog_data = {
         "filename": file.filename,
         "path": file_path,
         "type": "vlog"
     }
     await app.mongodb["vlogs"].insert_one(vlog_data)
+    return {"status": "Vlog saved"}
 
-    return {
-        "filename": file.filename,
-        "saved_to": file_path,
-        "status": "Saved to MongoDB"
-    }
+# --- 2. Sentiment 功能 ---
+# 定義情緒資料的格式
+class SentimentModel(BaseModel):
+    timestamp: str
+    emotion: str     # 例如: "Happy", "Sad"
+    score: float     # 例如: 0.95
 
-# [新增] 資料匯出 API (作業 Required)
-# 這是老師範例裡沒有，但作業說明要求一定要有的
+@app.post("/upload-sentiment/")
+async def upload_sentiment(data: SentimentModel):
+    # 將資料轉成字典並寫入 'sentiments' collection
+    await app.mongodb["sentiments"].insert_one(data.dict())
+    return {"status": "Sentiment saved", "data": data}
+
+# --- 3. GPS 功能 (新增) ---
+# 定義 GPS 資料的格式
+class GPSModel(BaseModel):
+    timestamp: str
+    latitude: float
+    longitude: float
+
+@app.post("/upload-gps/")
+async def upload_gps(data: GPSModel):
+    # 將資料轉成字典並寫入 'gps' collection
+    await app.mongodb["gps"].insert_one(data.dict())
+    return {"status": "GPS saved", "data": data}
+
+# --- 4. 匯出功能 (更新：讀取三種資料) ---
 @app.get("/export-data")
 async def export_data():
+    # 分別撈取三種資料 (各取前 100 筆)
     vlogs = await app.mongodb["vlogs"].find().to_list(100)
-    # 轉換 ObjectId 為字串
-    for doc in vlogs:
-        doc["_id"] = str(doc["_id"])
-    return {"vlogs": vlogs}
+    sentiments = await app.mongodb["sentiments"].find().to_list(100)
+    gps = await app.mongodb["gps"].find().to_list(100)
+
+    # 處理 ObjectId 轉字串
+    for doc in vlogs: doc["_id"] = str(doc["_id"])
+    for doc in sentiments: doc["_id"] = str(doc["_id"])
+    for doc in gps: doc["_id"] = str(doc["_id"])
+
+    return {
+        "vlogs": vlogs,
+        "sentiments": sentiments,
+        "gps": gps
+    }
