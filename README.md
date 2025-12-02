@@ -14,6 +14,12 @@ Upload test data using the interactive Swagger UI here:
 
 👉 **[API Docs / Swagger UI](https://emogo-backend-yinchi320.onrender.com/docs)**
 
+# 3. Gemini
+
+👉 **[Gemini](https://gemini.google.com/share/c439f144e89b)**
+
+
+
 
 ---
 
