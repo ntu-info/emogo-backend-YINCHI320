@@ -7,7 +7,6 @@ Download/view all collected data (Vlogs, Sentiments, & GPS):
 
 👉 **[View Export Data](https://emogo-backend-yinchi320.onrender.com/export-data)**
 
-*(Format: JSON containing lists of vlogs, sentiments, and gps coordinates)*
 
 ## 2. API Documentation & Testing
 Upload test data using the interactive Swagger UI here:
@@ -16,7 +15,7 @@ Upload test data using the interactive Swagger UI here:
 
 ## 3. Gemini
 
-👉 **[Gemini](https://gemini.google.com/share/c439f144e89b)**
+👉 **[Gemini](https://gemini.google.com/share/d1f1c762daff)**
 
 
 
