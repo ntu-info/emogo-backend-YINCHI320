@@ -16,7 +16,7 @@ Upload test data using the interactive Swagger UI here:
 
 ## 3. Gemini
 
-👉 **[Gemini](https://gemini.google.com/share/c439f144e89b)**
+👉 **[Gemini](https://gemini.google.com/share/d1f1c762daff)**
 
 
 
