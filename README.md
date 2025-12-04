@@ -7,6 +7,9 @@ Download/view all collected data (Vlogs, Sentiments, & GPS):
 
 👉 **[View Export Data](https://emogo-backend-yinchi320.onrender.com/export-data)**
 
+免費版伺服器似乎只要一段時間沒人連線，就會把硬碟重置，之前上傳到 data/ 資料夾的影片都會消失。所以即使網頁上還留著檔名，點下去卻找不到檔案、沒辦法成功下載影片。
+
+要測試下載功能，要麻煩老師當下先上傳一次影片，再到這個網址測試下載功能。
 
 ## 2. API Documentation & Testing
 Upload test data using the interactive Swagger UI here:
